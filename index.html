@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>pac-man game</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background-color: #343333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .pacman {
+            position: fixed;
+            width: 100px;
+            height: 100px;
+            background-color: yellow;
+            border-radius: 50%;
+            animation: eat 1s linear infinite;
+        }
+
+        .pacman::before {
+            content: '';
+            width: 50px;
+            height: 100px;
+            background-color: yellow;
+            position: absolute;
+            border-radius: 0 100px 100px 0;
+            top: 0;
+            right: 0;
+        }
+
+        @keyframes eat {
+            0%, 100% {
+                clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+            }
+            50% {
+                clip-path: polygon(0 0, 100% 0, 80% 50%, 100% 100%, 0% 100%);
+            }
+        }
+
+        .hollow-box {
+            width: 1000px;
+            height: 700px;
+            border: 5px solid rgb(0, 0, 0);
+            border-radius: 20px;
+            background-color: transparent;
+            position: relative;
+        }
+
+        .white-dot {
+            width: 15px;
+            height: 15px;
+            background-color: white;
+            border-radius: 50%;
+            position: absolute;
+        }
+
+        .white-dot:nth-child(1) {
+            top: 10%;
+            left: 10%;
+        }
+
+        .white-dot:nth-child(2) {
+            top: 10%;
+            right: 10%;
+        }
+
+        .white-dot:nth-child(3) {
+            bottom: 10%;
+            left: 10%;
+        }
+
+        .white-dot:nth-child(4) {
+            bottom: 10%;
+            right: 10%;
+        }
+
+        .white-dot:nth-child(5) {
+           top: 10%;
+           right: 65%;
+        }
+
+        .white-dot:nth-child(6) {
+            bottom: 65%;
+            right: 10%;
+        } 
+
+        .white-dot:nth-child(7) {
+            bottom: 35%;
+            right: 10%;
+        } 
+
+        .white-dot:nth-child(8) {
+            bottom: 10%;
+            right: 65%;
+        }
+
+        .white-dot:nth-child(9) {
+            bottom: 65%;
+            left: 10%;
+        } 
+
+        .white-dot:nth-child(10) {
+            bottom: 35%;
+            left: 10%;
+        } 
+
+        .white-dot:nth-child(11) {
+            top: 10%;
+            left: 65%;
+        } 
+
+        .white-dot:nth-child(12) {
+            bottom: 10%;
+            left: 65%;
+        } 
+
+        .white-dot:nth-child(13) {
+            bottom: 65%;
+            left: 65%;
+        } 
+
+        .white-dot:nth-child(14) {
+            bottom: 65%;
+           right:  65%;
+        } 
+
+        .white-dot:nth-child(15) {
+            bottom: 35%;
+            left: 65%;
+        } 
+
+        .white-dot:nth-child(16) {
+            bottom: 35%;
+           right:  65%;
+        } 
+     
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="pacman" id="pacman"></div>
+        <div class="hollow-box">
+            <div class="white-dot"></div>
+            <div class="white-dot"></div>
+            <div class="white-dot"></div>
+            <div class="white-dot"></div>        
+            <div class="white-dot"></div>
+            <div class="white-dot"></div>
+            <div class="white-dot"></div>   
+            <div class="white-dot"></div>
+            <div class="white-dot"></div>
+            <div class="white-dot"></div>
+            <div class="white-dot"></div>
+            <div class="white-dot"></div>
+            <div class="white-dot"></div>
+            <div class="white-dot"></div>
+            <div class="white-dot"></div>
+            <div class="white-dot"></div>
+
+        </div>
+    </div>
+    
+    
+  
+    <script>
+        const pacman = document.getElementById("pacman");
+        const whiteDots = document.querySelectorAll(".white-dot");
+        const hollowBox = document.querySelector(".hollow-box");
+    
+        // Initial position of Pac-Man
+        let posX = 0;
+        let posY = 0;
+    
+        // Track the hidden dots
+        const hiddenDots = new Set();
+    
+        // Function to check for collision and hide dots
+        function checkCollision() {
+            whiteDots.forEach((dot, index) => {
+                if (!hiddenDots.has(index)) {
+                    const dotRect = dot.getBoundingClientRect();
+                    const pacmanRect = pacman.getBoundingClientRect();
+                    if (
+                        pacmanRect.left < dotRect.right &&
+                        pacmanRect.right > dotRect.left &&
+                        pacmanRect.top < dotRect.bottom &&
+                        pacmanRect.bottom > dotRect.top
+                    ) {
+                        dot.style.display = "none";
+                        hiddenDots.add(index);
+    
+                        // Check if all dots are hidden
+                        if (hiddenDots.size === whiteDots.length) {
+                            // Display a message on the screen
+                            const message = document.createElement("div");
+                            message.innerText = "Bravo يفاجر";
+                            message.style.position = "fixed";
+                            message.style.top = "50%";
+                            message.style.left = "50%";
+                            message.style.transform = "translate(-50%, -50%)";
+                            message.style.color = "yellow";
+                            message.style.fontSize = "40px";
+                            document.body.appendChild(message);
+    
+                            // Hide the "Game Over" message after 2 seconds
+                            setTimeout(function() {
+                                document.body.removeChild(message);
+                                restartGame();
+                            }, 2000);
+                        }
+                    }
+                }
+            });
+    
+            // Check for collision with the black box
+            const pacmanRect = pacman.getBoundingClientRect();
+            const boxRect = hollowBox.getBoundingClientRect();
+            if (
+                pacmanRect.left < boxRect.left ||
+                pacmanRect.right > boxRect.right ||
+                pacmanRect.top < boxRect.top ||
+                pacmanRect.bottom > boxRect.bottom
+            ) {
+                // Display "Game Over" message
+                const gameOverMessage = document.createElement("div");
+                gameOverMessage.innerText = "Game Over!";
+                gameOverMessage.style.position = "fixed";
+                gameOverMessage.style.top = "50%";
+                gameOverMessage.style.left = "50%";
+                gameOverMessage.style.transform = "translate(-50%, -50%)";
+                gameOverMessage.style.color = "red";
+                gameOverMessage.style.fontSize = "40px";
+                document.body.appendChild(gameOverMessage);
+    
+                // Hide the "Game Over" message after 2 seconds
+                setTimeout(function() {
+                    document.body.removeChild(gameOverMessage);
+                    restartGame();
+                }, 2000);
+            }
+        }
+    
+     // Function to reset the game
+function restartGame() {
+    posX = 0;
+    posY = 0;
+    pacman.style.transform = `translate(${posX}px, ${posY}px)`;
+    hiddenDots.clear();
+
+    // Display all white dots
+    whiteDots.forEach((dot, index) => {
+        dot.style.display = "block";
+    });
+}
+
+    
+        document.addEventListener("keydown", function(event) {
+            switch(event.key) {
+                case "ArrowLeft":
+                    posX -= 10;
+                    break;
+                case "ArrowRight":
+                    posX += 10;
+                    break;
+                case "ArrowUp":
+                    posY -= 10;
+                    break;
+                case "ArrowDown":
+                    posY += 10;
+                    break;
+            }
+            pacman.style.transform = `translate(${posX}px, ${posY}px)`;
+            checkCollision();
+        });
+    </script>
+    
+    
+</body>
+</html>
+
